@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Facebook Pro</title>
+<style>
+  :root {
+    --blue: #1877F2;
+    --blue-dark: #145DB2;
+    --blue-light: #E7F0FD;
+    --bg: #F0F2F5;
+    --white: #fff;
+    --text: #050505;
+    --text-sec: #65676B;
+    --border: #CED0D4;
+    --card: #fff;
+    --green: #31A24C;
+    --red: #E41E3F;
+    --hover: #F2F2F2;
+    --radius: 8px;
+    --shadow: 0 1px 2px rgba(0,0,0,0.1);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); font-size: 15px; }
+
+  /* PAGES */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ===== LOGIN PAGE ===== */
+  #login-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+    padding: 20px;
+  }
+  .login-wrap { display: flex; gap: 40px; align-items: center; max-width: 980px; width: 100%; }
+  .login-left { flex: 1; }
+  .login-left .logo { color: var(--blue); font-size: 60px; font-weight: 700; letter-spacing: -2px; margin-bottom: 16px; }
+  .login-left p { font-size: 26px; line-height: 1.4; color: var(--text); }
+  .login-card {
+    background: var(--white);
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,.1), 0 8px 16px rgba(0,0,0,.1);
+    width: 360px;
+    flex-shrink: 0;
+  }
+  .login-card input {
+    width: 100%;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px 16px;
+    font-size: 17px;
+    margin-bottom: 12px;
+    outline: none;
+    transition: border-color .2s;
+  }
+  .login-card input:focus { border-color: var(--blue); }
+  .btn-blue {
+    width: 100%;
+    background: var(--blue);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 14px;
+    font-size: 20px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background .2s;
+  }
+  .btn-blue:hover { background: var(--blue-dark); }
+  .forgot-link { display: block; text-align: center; color: var(--blue); font-size: 14px; margin: 12px 0; text-decoration: none; }
+  .forgot-link:hover { text-decoration: underline; }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+  .btn-green {
+    display: block;
+    width: fit-content;
+    margin: 0 auto;
+    background: var(--green);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 14px 28px;
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background .2s;
+  }
+  .btn-green:hover { background: #288a3f; }
+
+  /* ===== NAVBAR ===== */
+  #navbar {
+    position: sticky; top: 0; z-index: 100;
+    background: var(--white);
+    box-shadow: var(--shadow);
+    height: 56px;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    gap: 8px;
+  }
+  .nav-logo { color: var(--blue); font-size: 28px; font-weight: 900; letter-spacing: -1px; text-decoration: none; margin-right: 8px; }
+  .nav-search {
+    background: var(--bg);
+    border: none;
+    border-radius: 20px;
+    padding: 8px 14px 8px 36px;
+    font-size: 15px;
+    width: 240px;
+    outline: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2365676B' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zm-5.242 1.656a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: 12px center;
+  }
+  .nav-tabs { display: flex; gap: 4px; flex: 1; justify-content: center; }
+  .nav-tab {
+    padding: 8px 28px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 20px;
+    color: var(--text-sec);
+    transition: background .15s, color .15s;
+    position: relative;
+  }
+  .nav-tab:hover { background: var(--hover); color: var(--blue); }
+  .nav-tab.active { color: var(--blue); }
+  .nav-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -4px; left: 0; right: 0;
+    height: 3px;
+    background: var(--blue);
+    border-radius: 2px;
+  }
+  .nav-badge {
+    position: absolute; top: 4px; right: 10px;
+    background: var(--red); color: #fff;
+    font-size: 11px; font-weight: 700;
+    border-radius: 10px; padding: 1px 5px;
+  }
+  .nav-right { display: flex; gap: 8px; align-items: center; }
+  .nav-icon-btn {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: none; cursor: pointer;
+    font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .15s;
+  }
+  .nav-icon-btn:hover { background: var(--border); }
+  .nav-avatar {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--blue);
+    color: #fff;
+    font-weight: 700;
+    font-size: 16px;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+  }
+
+  /* ===== MAIN LAYOUT ===== */
+  .main-layout {
+    display: grid;
+    grid-template-columns: 360px 1fr 360px;
+    gap: 0;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 16px 0;
+    min-height: calc(100vh - 56px);
+  }
+
+  /* ===== LEFT SIDEBAR ===== */
+  .left-sidebar { padding: 0 8px; position: sticky; top: 72px; height: fit-content; }
+  .sidebar-user {
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background .15s;
+    margin-bottom: 4px;
+    text-decoration: none; color: inherit;
+  }
+  .sidebar-user:hover { background: var(--hover); }
+  .sidebar-avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--blue); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 15px; flex-shrink: 0;
+  }
+  .sidebar-user span { font-weight: 600; font-size: 15px; }
+  .sidebar-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background .15s;
+    font-size: 15px; font-weight: 500;
+    margin-bottom: 2px;
+  }
+  .sidebar-item:hover { background: var(--hover); }
+  .sidebar-icon { font-size: 22px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--bg); }
+  .sidebar-more { color: var(--text-sec); font-size: 15px; font-weight: 600; padding: 8px; cursor: pointer; }
+  .sidebar-divider { border: none; border-top: 1px solid var(--border); margin: 8px 0; }
+  .sidebar-footer { font-size: 12px; color: var(--text-sec); padding: 8px; line-height: 1.6; }
+
+  /* ===== NEWSFEED ===== */
+  .newsfeed { padding: 0 8px; }
+
+  /* Story row */
+  .stories-row { display: flex; gap: 8px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 4px; }
+  .story-card {
+    width: 112px; height: 196px; border-radius: 12px;
+    overflow: hidden; flex-shrink: 0;
+    position: relative; cursor: pointer;
+    background: var(--border);
+    box-shadow: var(--shadow);
+  }
+  .story-bg { width: 100%; height: 100%; object-fit: cover; }
+  .story-color { width: 100%; height: 100%; display: flex; align-items: flex-end; padding-bottom: 12px; justify-content: center; }
+  .story-name { position: absolute; bottom: 8px; left: 0; right: 0; text-align: center; color: #fff; font-size: 13px; font-weight: 600; text-shadow: 0 1px 3px rgba(0,0,0,.5); }
+  .story-avatar { position: absolute; top: 10px; left: 10px; width: 40px; height: 40px; border-radius: 50%; border: 3px solid var(--blue); background: var(--blue); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; }
+  .add-story { background: var(--white); display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding-bottom: 12px; }
+  .add-story-icon { width: 40px; height: 40px; border-radius: 50%; background: var(--blue); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 700; margin-bottom: 8px; border: 3px solid #fff; box-shadow: var(--shadow); }
+  .add-story span { font-size: 13px; font-weight: 600; color: var(--text); }
+
+  /* Post composer */
+  .composer {
+    background: var(--white);
+    border-radius: 8px;
+    padding: 12px 16px;
+    box-shadow: var(--shadow);
+    margin-bottom: 16px;
+  }
+  .composer-top { display: flex; gap: 10px; align-items: center; margin-bottom: 10px; }
+  .composer-input {
+    flex: 1;
+    background: var(--bg);
+    border: none;
+    border-radius: 20px;
+    padding: 10px 16px;
+    font-size: 16px;
+    cursor: pointer;
+    color: var(--text-sec);
+    outline: none;
+    font-family: inherit;
+  }
+  .composer-input:focus { background: #e4e6ea; }
+  .composer-divider { border: none; border-top: 1px solid var(--border); margin: 4px 0 8px; }
+  .composer-actions { display: flex; gap: 4px; }
+  .composer-btn {
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 8px;
+    border-radius: 8px; border: none; background: transparent;
+    cursor: pointer; font-size: 14px; font-weight: 600; color: var(--text-sec);
+    transition: background .15s;
+  }
+  .composer-btn:hover { background: var(--hover); }
+
+  /* Post card */
+  .post-card {
+    background: var(--white);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+  .post-header { display: flex; align-items: center; gap: 10px; padding: 12px 16px 0; }
+  .post-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--blue); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; flex-shrink: 0; }
+  .post-meta { flex: 1; }
+  .post-author { font-weight: 700; font-size: 15px; cursor: pointer; }
+  .post-author:hover { text-decoration: underline; }
+  .post-time { font-size: 13px; color: var(--text-sec); }
+  .post-more { background: none; border: none; font-size: 20px; color: var(--text-sec); cursor: pointer; padding: 4px 8px; border-radius: 4px; }
+  .post-more:hover { background: var(--hover); }
+  .post-text { padding: 12px 16px; font-size: 15px; line-height: 1.5; }
+  .post-image { width: 100%; max-height: 500px; object-fit: cover; display: block; background: var(--bg); }
+  .post-image-placeholder { width: 100%; height: 300px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; font-size: 48px; }
+  .post-stats { display: flex; align-items: center; justify-content: space-between; padding: 8px 16px; border-bottom: 1px solid var(--border); font-size: 15px; color: var(--text-sec); }
+  .post-reactions { display: flex; gap: 2px; }
+  .reaction-icon { font-size: 18px; }
+  .post-actions { display: flex; }
+  .post-action-btn {
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 10px; border-radius: 4px; border: none; background: transparent;
+    cursor: pointer; font-size: 15px; font-weight: 600; color: var(--text-sec);
+    transition: background .15s, color .15s;
+  }
+  .post-action-btn:hover { background: var(--hover); color: var(--blue); }
+  .post-action-btn.liked { color: var(--blue); }
+
+  /* Comments */
+  .comments-section { padding: 8px 16px 12px; }
+  .comment-item { display: flex; gap: 8px; margin-bottom: 8px; }
+  .comment-avatar { width: 32px; height: 32px; border-radius: 50%; background: #E4E6EA; color: var(--text); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; flex-shrink: 0; }
+  .comment-bubble { background: var(--bg); border-radius: 18px; padding: 8px 12px; }
+  .comment-author { font-weight: 700; font-size: 13px; }
+  .comment-text { font-size: 14px; }
+  .comment-input-row { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
+  .comment-input { flex: 1; background: var(--bg); border: none; border-radius: 20px; padding: 8px 16px; font-size: 14px; outline: none; font-family: inherit; }
+
+  /* ===== RIGHT SIDEBAR ===== */
+  .right-sidebar { padding: 0 8px; position: sticky; top: 72px; height: fit-content; }
+  .rs-title { font-size: 17px; font-weight: 700; color: var(--text-sec); margin-bottom: 8px; }
+  .rs-ad { background: var(--white); border-radius: 8px; padding: 12px; box-shadow: var(--shadow); margin-bottom: 16px; }
+  .rs-ad-title { font-weight: 700; margin-bottom: 4px; }
+  .rs-ad-sub { font-size: 13px; color: var(--text-sec); }
+  .rs-ad-img { width: 100%; height: 120px; border-radius: 6px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); margin-bottom: 8px; display: flex; align-items: center; justify-content: center; font-size: 36px; }
+  .online-list { }
+  .online-item { display: flex; align-items: center; gap: 10px; padding: 6px 8px; border-radius: 8px; cursor: pointer; transition: background .15s; margin-bottom: 2px; }
+  .online-item:hover { background: var(--hover); }
+  .online-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--blue); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; position: relative; flex-shrink: 0; }
+  .online-dot { position: absolute; bottom: 0; right: 0; width: 12px; height: 12px; background: var(--green); border-radius: 50%; border: 2px solid #fff; }
+  .online-name { font-size: 15px; font-weight: 500; }
+
+  /* ===== PROFILE PAGE ===== */
+  #profile-page { display: none; }
+  #profile-page.active { display: block; }
+  .profile-cover {
+    height: 350px;
+    background: linear-gradient(135deg, #1877F2 0%, #42A5F5 100%);
+    position: relative;
+    border-radius: 0 0 8px 8px;
+  }
+  .profile-cover-edit {
+    position: absolute; bottom: 16px; right: 16px;
+    background: rgba(0,0,0,.5); color: #fff;
+    border: none; border-radius: 6px; padding: 8px 14px;
+    cursor: pointer; font-size: 14px; font-weight: 600;
+  }
+  .profile-info-wrap {
+    background: var(--white);
+    padding: 0 16px 16px;
+    box-shadow: var(--shadow);
+    margin-bottom: 16px;
+  }
+  .profile-avatar-wrap { position: relative; display: inline-block; margin-top: -70px; }
+  .profile-avatar-big {
+    width: 168px; height: 168px; border-radius: 50%;
+    background: var(--blue); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 60px;
+    border: 4px solid #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,.2);
+  }
+  .profile-header-row { display: flex; align-items: flex-end; justify-content: space-between; padding-top: 8px; }
+  .profile-name { font-size: 28px; font-weight: 700; }
+  .profile-bio { color: var(--text-sec); margin-top: 4px; font-size: 15px; }
+  .profile-friends-count { color: var(--text-sec); font-size: 15px; margin-top: 4px; }
+  .profile-friends-preview { display: flex; margin-top: 4px; }
+  .friend-mini { width: 32px; height: 32px; border-radius: 50%; background: var(--blue); border: 2px solid #fff; margin-right: -8px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; font-weight: 700; }
+  .profile-btns { display: flex; gap: 8px; }
+  .btn-edit {
+    background: var(--bg); color: var(--text);
+    border: none; border-radius: 6px; padding: 8px 16px;
+    font-size: 15px; font-weight: 600; cursor: pointer;
+    transition: background .15s;
+  }
+  .btn-edit:hover { background: var(--border); }
+  .profile-tabs { display: flex; border-top: 1px solid var(--border); margin-top: 12px; }
+  .profile-tab {
+    padding: 12px 16px;
+    border-radius: 8px; border: none; background: transparent;
+    cursor: pointer; font-size: 15px; font-weight: 600; color: var(--text-sec);
+    transition: background .15s;
+    position: relative;
+  }
+  .profile-tab:hover { background: var(--hover); }
+  .profile-tab.active { color: var(--blue); }
+  .profile-tab.active::after { content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 3px; background: var(--blue); border-radius: 2px; }
+  .profile-layout { display: grid; grid-template-columns: 360px 1fr; gap: 16px; max-width: 1100px; margin: 0 auto; padding: 0 16px; }
+  .profile-about-card { background: var(--white); border-radius: 8px; padding: 16px; box-shadow: var(--shadow); margin-bottom: 16px; }
+  .about-title { font-size: 20px; font-weight: 700; margin-bottom: 12px; }
+  .about-item { display: flex; align-items: center; gap: 10px; padding: 6px 0; font-size: 15px; color: var(--text-sec); }
+  .about-icon { font-size: 20px; }
+
+  /* ===== MODAL ===== */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,.5);
+    z-index: 200;
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal {
+    background: var(--white);
+    border-radius: 8px;
+    width: 500px;
+    max-width: 95vw;
+    box-shadow: 0 4px 32px rgba(0,0,0,.2);
+    overflow: hidden;
+  }
+  .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 16px; border-bottom: 1px solid var(--border); }
+  .modal-title { font-size: 20px; font-weight: 700; }
+  .modal-close { background: var(--bg); border: none; width: 36px; height: 36px; border-radius: 50%; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .modal-body { padding: 16px; }
+  .modal-textarea { width: 100%; border: none; font-size: 24px; outline: none; resize: none; font-family: inherit; color: var(--text); min-height: 100px; }
+  .modal-bottom { padding: 16px; border-top: 1px solid var(--border); display: flex; gap: 8px; }
+  .modal-media-btn { width: 40px; height: 40px; border-radius: 50%; background: var(--bg); border: none; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .btn-post { background: var(--blue); color: #fff; border: none; border-radius: 6px; padding: 8px 20px; font-size: 15px; font-weight: 700; cursor: pointer; margin-left: auto; }
+
+  /* Notification badge on nav */
+  .notif-badge { background: var(--red); color: #fff; font-size: 11px; font-weight: 700; border-radius: 10px; padding: 2px 5px; position: absolute; top: 2px; right: 2px; }
+
+  @media (max-width: 900px) {
+    .main-layout { grid-template-columns: 1fr; }
+    .left-sidebar, .right-sidebar { display: none; }
+    .login-wrap { flex-direction: column; }
+    .login-left { text-align: center; }
+    .profile-layout { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOGIN PAGE -->
+<div id="login-page" class="page active">
+  <div class="login-wrap">
+    <div class="login-left">
+      <div class="logo">facebook<span style="color:#1877F2">pro</span></div>
+      <p>Facebook Pro তে স্বাগতম — বন্ধুদের সাথে সংযুক্ত থাকো, শেয়ার করো।</p>
+    </div>
+    <div class="login-card">
+      <input type="email" id="email-input" placeholder="ইমেইল বা ফোন নম্বর" value="siyam@facebookpro.com">
+      <input type="password" id="pass-input" placeholder="পাসওয়ার্ড" value="••••••••">
+      <button class="btn-blue" onclick="doLogin()">লগ ইন</button>
+      <a href="#" class="forgot-link">পাসওয়ার্ড ভুলে গেছো?</a>
+      <hr class="divider">
+      <button class="btn-green" onclick="showSignup()">নতুন অ্যাকাউন্ট খোলো</button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app-page" class="page">
+
+  <!-- NAVBAR -->
+  <nav id="navbar">
+    <a class="nav-logo" href="#" onclick="showFeed()">fp</a>
+    <input class="nav-search" placeholder="Facebook Pro খুঁজুন">
+    <div class="nav-tabs">
+      <button class="nav-tab active" id="tab-home" onclick="showFeed(); setTab('tab-home')">🏠</button>
+      <button class="nav-tab" id="tab-friends" onclick="setTab('tab-friends')" style="position:relative">👥<span class="nav-badge">3</span></button>
+      <button class="nav-tab" id="tab-watch" onclick="setTab('tab-watch')">📺</button>
+      <button class="nav-tab" id="tab-market" onclick="setTab('tab-market')">🛒</button>
+      <button class="nav-tab" id="tab-group" onclick="setTab('tab-group')">👨‍👩‍👧‍👦</button>
+    </div>
+    <div class="nav-right">
+      <button class="nav-icon-btn" style="position:relative" title="মেনু">☰<span class="notif-badge">2</span></button>
+      <button class="nav-icon-btn" style="position:relative" title="মেসেজ">💬</button>
+      <button class="nav-icon-btn" style="position:relative" title="নোটিফিকেশন">🔔<span class="notif-badge">5</span></button>
+      <div class="nav-avatar" onclick="showProfile()" title="প্রোফাইল">S</div>
+      <button class="nav-icon-btn" onclick="doLogout()" title="লগ আউট">⏏</button>
+    </div>
+  </nav>
+
+  <!-- NEWSFEED VIEW -->
+  <div id="feed-view">
+    <div class="main-layout">
+
+      <!-- LEFT SIDEBAR -->
+      <div class="left-sidebar">
+        <div class="sidebar-user" onclick="showProfile()">
+          <div class="sidebar-avatar">S</div>
+          <span>Siyam Ahmed</span>
+        </div>
+        <div class="sidebar-item"><div class="sidebar-icon">👥</div> বন্ধুরা</div>
+        <div class="sidebar-item"><div class="sidebar-icon">📺</div> Watch</div>
+        <div class="sidebar-item"><div class="sidebar-icon">🛒</div> Marketplace</div>
+        <div class="sidebar-item"><div class="sidebar-icon">👨‍👩‍👧‍👦</div> গ্রুপ</div>
+        <div class="sidebar-item"><div class="sidebar-icon">🎮</div> Gaming</div>
+        <div class="sidebar-item"><div class="sidebar-icon">📅</div> ইভেন্ট</div>
+        <div class="sidebar-item"><div class="sidebar-icon">🏪</div> পেজ</div>
+        <div class="sidebar-more">আরও দেখুন ▾</div>
+        <hr class="sidebar-divider">
+        <div style="font-size:13px;font-weight:700;color:var(--text-sec);padding:8px;">তোমার শর্টকাট</div>
+        <div class="sidebar-item"><div class="sidebar-icon">🎯</div> Siyam's Group</div>
+        <div class="sidebar-item"><div class="sidebar-icon">⚽</div> Football Fans BD</div>
+        <hr class="sidebar-divider">
+        <div class="sidebar-footer">
+          গোপনীয়তা · শর্তাবলী · বিজ্ঞাপন · কুকি · আরও ·<br>
+          Facebook Pro © 2025
+        </div>
+      </div>
+
+      <!-- NEWSFEED -->
+      <div class="newsfeed">
+
+        <!-- Stories -->
+        <div class="stories-row">
+          <div class="story-card add-story">
+            <div style="width:100%;height:65%;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:48px;">📷</div>
+            <div class="add-story-icon">+</div>
+            <span>স্টোরি যোগ করো</span>
+          </div>
+          <div class="story-card" style="background:linear-gradient(180deg,#667eea,#764ba2)">
+            <div class="story-avatar">R</div>
+            <div class="story-name">Rahim</div>
+          </div>
+          <div class="story-card" style="background:linear-gradient(180deg,#f093fb,#f5576c)">
+            <div class="story-avatar">K</div>
+            <div class="story-name">Karim</div>
+          </div>
+          <div class="story-card" style="background:linear-gradient(180deg,#4facfe,#00f2fe)">
+            <div class="story-avatar">N</div>
+            <div class="story-name">Nila</div>
+          </div>
+          <div class="story-card" style="background:linear-gradient(180deg,#43e97b,#38f9d7)">
+            <div class="story-avatar">T</div>
+            <div class="story-name">Tanha</div>
+          </div>
+        </div>
+
+        <!-- Composer -->
+        <div class="composer">
+          <div class="composer-top">
+            <div class="nav-avatar">S</div>
+            <input class="composer-input" placeholder="কী ভাবছো, Siyam?" onclick="openPostModal()" readonly>
+          </div>
+          <hr class="composer-divider">
+          <div class="composer-actions">
+            <button class="composer-btn">📹 লাইভ ভিডিও</button>
+            <button class="composer-btn">🖼️ ফটো/ভিডিও</button>
+            <button class="composer-btn">😊 অনুভূতি</button>
+          </div>
+        </div>
+
+        <!-- Posts -->
+        <div id="posts-container"></div>
+
+      </div>
+
+      <!-- RIGHT SIDEBAR -->
+      <div class="right-sidebar">
+        <div class="rs-title">স্পনসর করা</div>
+        <div class="rs-ad">
+          <div class="rs-ad-img">🛍️</div>
+          <div class="rs-ad-title">Daraz BD সেল</div>
+          <div class="rs-ad-sub">daraz.com.bd</div>
+        </div>
+        <div class="rs-ad">
+          <div class="rs-ad-img" style="background:linear-gradient(135deg,#11998e,#38ef7d)">🎓</div>
+          <div class="rs-ad-title">অনলাইনে শেখো</div>
+          <div class="rs-ad-sub">10minuteschool.com</div>
+        </div>
+        <hr class="sidebar-divider">
+        <div class="rs-title">অনলাইনে আছে</div>
+        <div class="online-list" id="online-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROFILE VIEW -->
+  <div id="profile-view" style="display:none;">
+    <div class="profile-cover">
+      <button class="profile-cover-edit">📷 কভার ফটো পরিবর্তন করো</button>
+    </div>
+    <div class="profile-info-wrap">
+      <div style="max-width:1100px;margin:0 auto;padding:0 16px;">
+        <div class="profile-header-row">
+          <div style="display:flex;align-items:flex-end;gap:16px;">
+            <div class="profile-avatar-wrap">
+              <div class="profile-avatar-big">S</div>
+            </div>
+            <div style="padding-bottom:12px;">
+              <div class="profile-name">Siyam Ahmed</div>
+              <div class="profile-friends-count">৪৮৭ জন বন্ধু</div>
+              <div class="profile-friends-preview">
+                <div class="friend-mini" style="background:#e91e63;">R</div>
+                <div class="friend-mini" style="background:#9c27b0;">K</div>
+                <div class="friend-mini" style="background:#3f51b5;">N</div>
+                <div class="friend-mini" style="background:#009688;">T</div>
+                <div class="friend-mini" style="background:#ff5722;">A</div>
+              </div>
+            </div>
+          </div>
+          <div class="profile-btns" style="padding-bottom:12px;">
+            <button class="btn-blue" style="width:auto;padding:8px 16px;font-size:15px;">➕ স্টোরি যোগ করো</button>
+            <button class="btn-edit">✏️ প্রোফাইল সম্পাদনা</button>
+            <button class="btn-edit">⋯</button>
+          </div>
+        </div>
+        <hr class="sidebar-divider">
+        <div class="profile-tabs">
+          <button class="profile-tab active">পোস্ট</button>
+          <button class="profile-tab">সম্পর্কে</button>
+          <button class="profile-tab">বন্ধুরা</button>
+          <button class="profile-tab">ফটো</button>
+          <button class="profile-tab">ভিডিও</button>
+          <button class="profile-tab">আরও ▾</button>
+        </div>
+      </div>
+    </div>
+    <div class="profile-layout">
+      <div>
+        <div class="profile-about-card">
+          <div class="about-title">পরিচিতি</div>
+          <div class="about-item"><span class="about-icon">🎓</span> BUET এ পড়াশোনা করেছেন</div>
+          <div class="about-item"><span class="about-icon">🏠</span> ঢাকা, বাংলাদেশ থেকে</div>
+          <div class="about-item"><span class="about-icon">📍</span> ঢাকায় বাস করেন</div>
+          <div class="about-item"><span class="about-icon">❤️</span> সম্পর্কের অবস্থা উল্লেখ নেই</div>
+          <div class="about-item"><span class="about-icon">👁️</span> ৪৮৭ জন বন্ধু</div>
+          <button class="btn-edit" style="width:100%;margin-top:8px;">পরিচিতি সম্পাদনা করো</button>
+        </div>
+        <div class="profile-about-card">
+          <div class="about-title">ফটো</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;">
+            <div style="height:100px;background:linear-gradient(135deg,#667eea,#764ba2);border-radius:4px;"></div>
+            <div style="height:100px;background:linear-gradient(135deg,#f093fb,#f5576c);border-radius:4px;"></div>
+            <div style="height:100px;background:linear-gradient(135deg,#4facfe,#00f2fe);border-radius:4px;"></div>
+            <div style="height:100px;background:linear-gradient(135deg,#43e97b,#38f9d7);border-radius:4px;"></div>
+            <div style="height:100px;background:linear-gradient(135deg,#fa709a,#fee140);border-radius:4px;"></div>
+            <div style="height:100px;background:linear-gradient(135deg,#a18cd1,#fbc2eb);border-radius:4px;"></div>
+          </div>
+        </div>
+      </div>
+      <div id="profile-posts"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- POST MODAL -->
+<div class="modal-overlay" id="post-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">পোস্ট তৈরি করো</div>
+      <button class="modal-close" onclick="closePostModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px;">
+        <div class="nav-avatar">S</div>
+        <div>
+          <div style="font-weight:700;">Siyam Ahmed</div>
+          <div style="font-size:13px;background:var(--bg);padding:2px 8px;border-radius:4px;display:inline-flex;align-items:center;gap:4px;">🌍 সবাই ▾</div>
+        </div>
+      </div>
+      <textarea class="modal-textarea" id="post-text" placeholder="কী ভাবছো, Siyam?"></textarea>
+    </div>
+    <div class="modal-bottom">
+      <div style="display:flex;gap:6px;align-items:center;flex:1;">
+        <span style="font-size:14px;font-weight:600;">তোমার পোস্টে যোগ করো</span>
+        <button class="modal-media-btn" title="ফটো">🖼️</button>
+        <button class="modal-media-btn" title="ট্যাগ">🏷️</button>
+        <button class="modal-media-btn" title="অনুভূতি">😊</button>
+        <button class="modal-media-btn" title="লোকেশন">📍</button>
+      </div>
+      <button class="btn-post" onclick="submitPost()">পোস্ট করো</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const currentUser = { name: 'Siyam Ahmed', initial: 'S', avatar_color: '#1877F2' };
+
+let posts = [
+  {
+    id: 1, author: 'Rahim Uddin', initial: 'R', color: '#9c27b0',
+    time: '২ ঘণ্টা আগে',
+    text: 'আজকে ঢাকায় অনেক সুন্দর আবহাওয়া! বৃষ্টির পর রাস্তাঘাট ঠান্ডা হয়ে গেছে। সবাই কেমন আছো? 🌧️❤️',
+    image: null, bg: 'linear-gradient(135deg,#667eea,#764ba2)',
+    likes: 47, comments: 12, shares: 5, liked: false,
+    commentList: [
+      { initial: 'K', name: 'Karim Hossain', text: 'হ্যাঁ ভাই! আজকে অনেক ভালো লাগছে।' },
+      { initial: 'N', name: 'Nila Akter', text: '❤️ সত্যিই অনেক সুন্দর!' }
+    ]
+  },
+  {
+    id: 2, author: 'Nila Akter', initial: 'N', color: '#e91e63',
+    time: '৫ ঘণ্টা আগে',
+    text: 'নতুন রেসিপি ট্রাই করলাম — চিকেন বিরিয়ানি! প্রথমবার বানিয়ে এত ভালো হবে ভাবিনি। 🍛🎉',
+    image: true, bg: 'linear-gradient(135deg,#f093fb,#f5576c)',
+    likes: 134, comments: 28, shares: 15, liked: false,
+    commentList: [
+      { initial: 'S', name: 'Siyam Ahmed', text: 'ওয়াও! রেসিপি শেয়ার করো প্লিজ।' }
+    ]
+  },
+  {
+    id: 3, author: 'Karim Hossain', initial: 'K', color: '#3f51b5',
+    time: 'গতকাল',
+    text: 'ফুটবল ম্যাচ দেখলাম! বাংলাদেশ জিতছে! 🏆⚽ সবাই মিলে চিয়ার করলাম। কী মজা ছিল!',
+    image: null, bg: 'linear-gradient(135deg,#4facfe,#00f2fe)',
+    likes: 89, comments: 34, shares: 22, liked: false,
+    commentList: [
+      { initial: 'R', name: 'Rahim Uddin', text: '⚽ গোল গোল গোল!' },
+      { initial: 'T', name: 'Tanha Begum', text: 'অনেক মজা হয়েছে ভাই!' }
+    ]
+  }
+];
+
+const onlineFriends = [
+  { name: 'Karim Hossain', initial: 'K', color: '#3f51b5' },
+  { name: 'Nila Akter', initial: 'N', color: '#e91e63' },
+  { name: 'Tanha Begum', initial: 'T', color: '#009688' },
+  { name: 'Abdul Rahman', initial: 'A', color: '#ff5722' },
+  { name: 'Mitu Islam', initial: 'M', color: '#795548' },
+];
+
+function doLogin() {
+  document.getElementById('login-page').classList.remove('active');
+  document.getElementById('app-page').classList.add('active');
+  renderPosts();
+  renderOnline();
+  renderProfilePosts();
+}
+
+function doLogout() {
+  document.getElementById('app-page').classList.remove('active');
+  document.getElementById('login-page').classList.add('active');
+}
+
+function showSignup() { alert('নতুন অ্যাকাউন্ট তৈরি করো — শীঘ্রই আসছে!'); }
+
+function setTab(id) {
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function showFeed() {
+  document.getElementById('feed-view').style.display = '';
+  document.getElementById('profile-view').style.display = 'none';
+}
+
+function showProfile() {
+  document.getElementById('feed-view').style.display = 'none';
+  document.getElementById('profile-view').style.display = '';
+}
+
+function openPostModal() { document.getElementById('post-modal').classList.add('active'); }
+function closePostModal() { document.getElementById('post-modal').classList.remove('active'); }
+
+function submitPost() {
+  const text = document.getElementById('post-text').value.trim();
+  if (!text) { alert('কিছু লেখো!'); return; }
+  const newPost = {
+    id: Date.now(), author: 'Siyam Ahmed', initial: 'S', color: '#1877F2',
+    time: 'এইমাত্র', text, image: false,
+    bg: 'linear-gradient(135deg,#1877F2,#42A5F5)',
+    likes: 0, comments: 0, shares: 0, liked: false, commentList: []
+  };
+  posts.unshift(newPost);
+  renderPosts();
+  document.getElementById('post-text').value = '';
+  closePostModal();
+}
+
+function toggleLike(id) {
+  const p = posts.find(x => x.id === id);
+  p.liked = !p.liked;
+  p.likes += p.liked ? 1 : -1;
+  renderPosts();
+}
+
+function addComment(id) {
+  const input = document.getElementById('comment-input-' + id);
+  const text = input.value.trim();
+  if (!text) return;
+  const p = posts.find(x => x.id === id);
+  p.commentList.push({ initial: 'S', name: 'Siyam Ahmed', text });
+  p.comments++;
+  input.value = '';
+  renderPosts();
+}
+
+function renderPosts() {
+  const c = document.getElementById('posts-container');
+  c.innerHTML = posts.map(p => `
+    <div class="post-card">
+      <div class="post-header">
+        <div class="post-avatar" style="background:${p.color}">${p.initial}</div>
+        <div class="post-meta">
+          <div class="post-author">${p.author}</div>
+          <div class="post-time">${p.time} · 🌍</div>
+        </div>
+        <button class="post-more">⋯</button>
+      </div>
+      <div class="post-text">${p.text}</div>
+      ${p.image ? `<div class="post-image-placeholder" style="background:${p.bg}">🖼️</div>` : ''}
+      <div class="post-stats">
+        <div class="post-reactions">
+          <span class="reaction-icon">👍</span>
+          <span class="reaction-icon">❤️</span>
+          <span class="reaction-icon">😂</span>
+          <span style="margin-left:4px">${p.likes}</span>
+        </div>
+        <div>${p.comments} মন্তব্য · ${p.shares} শেয়ার</div>
+      </div>
+      <div class="post-actions">
+        <button class="post-action-btn ${p.liked ? 'liked' : ''}" onclick="toggleLike(${p.id})">
+          👍 ${p.liked ? 'পছন্দ করা হয়েছে' : 'পছন্দ'}
+        </button>
+        <button class="post-action-btn">💬 মন্তব্য</button>
+        <button class="post-action-btn">↗️ শেয়ার</button>
+      </div>
+      ${p.commentList.length > 0 ? `
+      <div class="comments-section">
+        ${p.commentList.map(cm => `
+          <div class="comment-item">
+            <div class="comment-avatar" style="background:${cm.initial==='S'?'#1877F2':cm.initial==='R'?'#9c27b0':cm.initial==='K'?'#3f51b5':'#e91e63'};color:#fff">${cm.initial}</div>
+            <div class="comment-bubble">
+              <div class="comment-author">${cm.name}</div>
+              <div class="comment-text">${cm.text}</div>
+            </div>
+          </div>
+        `).join('')}
+        <div class="comment-input-row">
+          <div class="comment-avatar" style="background:#1877F2;color:#fff">S</div>
+          <input class="comment-input" id="comment-input-${p.id}" placeholder="মন্তব্য লেখো..." onkeydown="if(event.key==='Enter')addComment(${p.id})">
+        </div>
+      </div>` : `
+      <div class="comments-section">
+        <div class="comment-input-row">
+          <div class="comment-avatar" style="background:#1877F2;color:#fff">S</div>
+          <input class="comment-input" id="comment-input-${p.id}" placeholder="মন্তব্য লেখো..." onkeydown="if(event.key==='Enter')addComment(${p.id})">
+        </div>
+      </div>`}
+    </div>
+  `).join('');
+}
+
+function renderOnline() {
+  document.getElementById('online-list').innerHTML = onlineFriends.map(f => `
+    <div class="online-item">
+      <div class="online-avatar" style="background:${f.color}">${f.initial}<div class="online-dot"></div></div>
+      <div class="online-name">${f.name}</div>
+    </div>
+  `).join('');
+}
+
+function renderProfilePosts() {
+  document.getElementById('profile-posts').innerHTML = `
+    <div class="composer">
+      <div class="composer-top">
+        <div class="nav-avatar">S</div>
+        <input class="composer-input" placeholder="কী ভাবছো, Siyam?" onclick="openPostModal()" readonly>
+      </div>
+      <hr class="composer-divider">
+      <div class="composer-actions">
+        <button class="composer-btn">📹 লাইভ ভিডিও</button>
+        <button class="composer-btn">🖼️ ফটো/ভিডিও</button>
+        <button class="composer-btn">😊 অনুভূতি</button>
+      </div>
+    </div>
+    ${posts.filter(p => p.author === 'Siyam Ahmed').map(p => `
+      <div class="post-card">
+        <div class="post-header">
+          <div class="post-avatar" style="background:${p.color}">${p.initial}</div>
+          <div class="post-meta">
+            <div class="post-author">${p.author}</div>
+            <div class="post-time">${p.time} · 🌍</div>
+          </div>
+        </div>
+        <div class="post-text">${p.text}</div>
+        <div class="post-stats">
+          <div class="post-reactions"><span>👍</span><span>❤️</span> ${p.likes}</div>
+          <div>${p.comments} মন্তব্য</div>
+        </div>
+        <div class="post-actions">
+          <button class="post-action-btn ${p.liked?'liked':''}" onclick="toggleLike(${p.id});renderProfilePosts()">👍 পছন্দ</button>
+          <button class="post-action-btn">💬 মন্তব্য</button>
+          <button class="post-action-btn">↗️ শেয়ার</button>
+        </div>
+      </div>
+    `).join('') || '<div style="text-align:center;padding:40px;color:var(--text-sec);">এখনো কোনো পোস্ট নেই।</div>'}
+  `;
+}
+
+document.getElementById('post-modal').addEventListener('click', function(e) {
+  if (e.target === this) closePostModal();
+});
+
+document.getElementById('email-input').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+document.getElementById('pass-input').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+</script>
+</body>
+</html>
